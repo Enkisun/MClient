@@ -2,13 +2,20 @@ import React from "react";
 import { Container, makeStyles } from "@material-ui/core";
 import Header from "./header";
 
-const useStyles = makeStyles((theme) => ({
-  main: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.default,
-    padding: theme.spacing(0, 2),
-  },
-}));
+const useStyles = makeStyles(
+  (theme) => ({
+    main: {
+      minHeight: "100vh",
+      height: "100%",
+      flexGrow: 1,
+      backgroundColor: theme.palette.background.default,
+      padding: theme.spacing(7, 2, 2),
+    },
+  }),
+  {
+    name: "layoutStyle",
+  }
+);
 
 const Layout = ({ children }) => {
   const styles = useStyles();

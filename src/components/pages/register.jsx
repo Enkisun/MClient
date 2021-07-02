@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Grid,
   Box,
@@ -9,50 +11,55 @@ import {
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { unwrapResult } from "@reduxjs/toolkit";
-import { useDispatch, useSelector } from "react-redux";
-import { register } from "../../reducers/authSlice";
-import Loader from "../../utils/loader";
+import { register } from "../../slices/authSlice";
+import Loader from "../elements/loader";
 
-const useStyles = makeStyles((theme) => ({
-  grid: {
-    height: "100vh",
-    padding: theme.spacing(8, 0, 2),
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "space-between",
-    height: "100%",
-  },
-  title: {
-    marginBottom: theme.spacing(2),
-    padding: "0 30px",
-  },
-  field: {
-    marginBottom: theme.spacing(2),
-    "&nth-child(3)": {
-      marginBottom: 50,
+const useStyles = makeStyles(
+  (theme) => ({
+    grid: {
+      height: "100%",
+      paddingTop: theme.spacing(2),
     },
-  },
-  submitWrapper: {
-    width: "100%",
-  },
-  submit: {
-    height: 42,
-  },
-  link: {
-    color: theme.palette.secondary.main,
-    textTransform: "capitalize",
-    textDecoration: "underline",
-  },
-}));
+    form: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "space-between",
+      height: "100%",
+    },
+    title: {
+      marginBottom: theme.spacing(2),
+      padding: "0 30px",
+    },
+    field: {
+      marginBottom: theme.spacing(2),
+      "&nth-child(3)": {
+        marginBottom: 50,
+      },
+    },
+    submitWrapper: {
+      width: "100%",
+    },
+    submit: {
+      height: 42,
+    },
+    link: {
+      color: theme.palette.secondary.main,
+      textTransform: "capitalize",
+      textDecoration: "underline",
+    },
+  }),
+  {
+    name: "registerStyle",
+  }
+);
 
 const RegisterPage = () => {
+  const history = useHistory();
   const styles = useStyles();
 
   const dispatch = useDispatch();
-  const isLoading = useSelector((s) => s.auth.isLoading);
+  const { isLoading, token } = useSelector((s) => s.auth);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -60,6 +67,12 @@ const RegisterPage = () => {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirm, setConfirm] = useState("");
+
+  useEffect(() => {
+    if (token) {
+      history.push("/");
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -71,6 +84,7 @@ const RegisterPage = () => {
 
     try {
       unwrapResult(await dispatch(register({ email, password })));
+      history.push("/home");
     } catch (errData) {
       if (!errData.errors) {
         return setError(errData.message);
@@ -156,7 +170,7 @@ const RegisterPage = () => {
             variant="outlined"
             className={styles.field}
             type="password"
-            autoComplete={false}
+            autoComplete="false"
             fullWidth
             required
           />
