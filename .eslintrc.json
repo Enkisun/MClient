@@ -1,0 +1,51 @@
+{
+	"extends": [
+		"airbnb",
+		"prettier",
+		"plugin:node/recommended",
+		"plugin:import/react"
+	],
+	"plugins": ["prettier", "react-hooks"],
+	"parserOptions": {
+		"sourceType": "module"
+	},
+	"env": {
+		"browser": true,
+		"node": true,
+		"es6": true
+	},
+	"rules": {
+		"spaced-comment": "off",
+		"no-console": "warn",
+		"consistent-return": "off",
+		"func-names": "off",
+		"object-shorthand": "off",
+		"no-process-exit": "off",
+		"no-param-reassign": "off",
+		"no-return-await": "off",
+		"no-underscore-dangle": "off",
+		"node/no-missing-import": "off",
+		"class-methods-use-this": "off",
+		"react/prop-types": "off",
+		"react-hooks/rules-of-hooks": "error",
+		"react-hooks/exhaustive-deps": "off",
+		"react/jsx-props-no-spreading": ["error", { "custom": "ignore" }],
+		"prettier/prettier": ["error", {}, { "usePrettierrc": true }],
+		"prefer-destructuring": ["error", { "object": true, "array": false }],
+		"no-unused-vars": ["error", { "argsIgnorePattern": "req|res|next|val" }],
+		"node/no-unsupported-features/es-syntax": [
+			"error",
+			{
+				"version": ">=13.0.0",
+				"ignores": ["modules"]
+			}
+		]
+	},
+	"settings": {
+		"import/resolver": {
+			"node": {
+				"paths": ["src"]
+			}
+		}
+	}
+}
