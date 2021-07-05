@@ -1,8 +1,8 @@
 import React from "react";
+import { withRouter } from "react-router";
 import { useDispatch } from "react-redux";
 import { Box, Button } from "@material-ui/core";
 import { logout } from "../../slices/authSlice";
-import { withRouter } from "react-router";
 
 const HomePage = () => {
   const dispatch = useDispatch();

@@ -17,24 +17,22 @@ import Loader from "../elements/loader";
 const useStyles = makeStyles(
   (theme) => ({
     grid: {
-      height: "100%",
-      paddingTop: theme.spacing(2),
-    },
-    form: {
       display: "flex",
-      flexDirection: "column",
+      justifyContent: "center",
       alignItems: "center",
-      justifyContent: "space-between",
       height: "100%",
     },
     title: {
-      marginBottom: theme.spacing(2),
-      padding: "0 30px",
+      marginBottom: theme.spacing(3),
+      padding: theme.spacing(0, 4),
+    },
+    formData: {
+      marginBottom: theme.spacing(5),
     },
     field: {
       marginBottom: theme.spacing(2),
-      "&nth-child(2)": {
-        marginBottom: 50,
+      "&:nth-of-type(2)": {
+        marginBottom: (props) => theme.spacing(props.error ? 2 : 0),
       },
     },
     submitWrapper: {
@@ -42,6 +40,9 @@ const useStyles = makeStyles(
     },
     submit: {
       height: 42,
+    },
+    forgot: {
+      marginBottom: theme.spacing(2),
     },
     link: {
       color: theme.palette.secondary.main,
@@ -56,7 +57,6 @@ const useStyles = makeStyles(
 
 const LoginPage = () => {
   const history = useHistory();
-  const styles = useStyles();
 
   const dispatch = useDispatch();
   const { isLoading, token } = useSelector((s) => s.auth);
@@ -66,6 +66,8 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+
+  const styles = useStyles({ error: !!error });
 
   useEffect(() => {
     if (token) {
@@ -88,7 +90,9 @@ const LoginPage = () => {
         setEmailError(errData.errors[0].msg);
       } else setPasswordError(errData.errors[0].msg);
 
-      errData.errors[1] && setPasswordError(errData.errors[1].msg);
+      if (errData.errors[1]) {
+        return setPasswordError(errData.errors[1].msg);
+      }
     }
   };
 
@@ -106,50 +110,47 @@ const LoginPage = () => {
 
   return (
     <Grid className={styles.grid} align="center">
-      <form className={styles.form} onSubmit={handleSubmit} noValidate>
+      <form onSubmit={handleSubmit} noValidate>
         <Box>
           <Box className={styles.title}>
-            <Typography variant="h3">Sign in</Typography>
+            <Typography variant="h4">Sign in</Typography>
           </Box>
-          <TextField
-            id="email"
-            name="email"
-            value={email}
-            onChange={handleEmail}
-            error={!!emailError}
-            helperText={emailError}
-            label="Email"
-            placeholder="Enter your email"
-            variant="outlined"
-            type="email"
-            className={styles.field}
-            autoFocus
-            fullWidth
-            required
-          />
-          <TextField
-            id="password"
-            name="password"
-            value={password}
-            onChange={handlePassword}
-            error={!!passwordError}
-            helperText={passwordError}
-            label="Password"
-            placeholder="Enter your password"
-            variant="outlined"
-            type="password"
-            className={styles.field}
-            fullWidth
-            required
-          />
-          {!!error && error && <Typography color="error">{error}</Typography>}
+          <Box className={styles.formData}>
+            <TextField
+              id="email"
+              name="email"
+              value={email}
+              onChange={handleEmail}
+              error={!!emailError}
+              helperText={emailError}
+              label="Email"
+              placeholder="Enter your email"
+              variant="outlined"
+              type="email"
+              className={styles.field}
+              autoFocus
+              fullWidth
+              required
+            />
+            <TextField
+              id="password"
+              name="password"
+              value={password}
+              onChange={handlePassword}
+              error={!!passwordError}
+              helperText={passwordError}
+              label="Password"
+              placeholder="Enter your password"
+              variant="outlined"
+              type="password"
+              className={styles.field}
+              fullWidth
+              required
+            />
+            {!!error && error && <Typography color="error">{error}</Typography>}
+          </Box>
         </Box>
         <Box className={styles.submitWrapper}>
-          <Typography align="left">
-            <Button className={styles.link} href="/login" component={Link}>
-              Forgot password?
-            </Button>
-          </Typography>
           <Button
             className={styles.submit}
             disabled={isLoading}
@@ -160,8 +161,13 @@ const LoginPage = () => {
           >
             {isLoading ? <Loader /> : `Sign in`}
           </Button>
+          <Typography className={styles.forgot}>
+            <Button className={styles.link} href="/login" component={Link}>
+              Forgot password?
+            </Button>
+          </Typography>
           <Typography>
-            Don't have an account?
+            Don&apos;t have an account?
             <Button className={styles.link} href="/register" component={Link}>
               {` Sign Up Now`}
             </Button>

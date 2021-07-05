@@ -9,7 +9,7 @@ const useStyles = makeStyles(
       height: "100%",
       flexGrow: 1,
       backgroundColor: theme.palette.background.default,
-      padding: theme.spacing(7, 2, 2),
+      padding: theme.spacing(9, 2, 2),
     },
   }),
   {

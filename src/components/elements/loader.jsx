@@ -81,14 +81,14 @@ const Loader = () => {
   return (
     <Container className={styles.loaderWrapper}>
       <Box className={styles.loader}>
-        <Box className={styles.loaderItem}></Box>
-        <Box className={styles.loaderItem}></Box>
-        <Box className={styles.loaderItem}></Box>
-        <Box className={styles.loaderItem}></Box>
-        <Box className={styles.loaderItem}></Box>
-        <Box className={styles.loaderItem}></Box>
-        <Box className={styles.loaderItem}></Box>
-        <Box className={styles.loaderItem}></Box>
+        <Box className={styles.loaderItem} />
+        <Box className={styles.loaderItem} />
+        <Box className={styles.loaderItem} />
+        <Box className={styles.loaderItem} />
+        <Box className={styles.loaderItem} />
+        <Box className={styles.loaderItem} />
+        <Box className={styles.loaderItem} />
+        <Box className={styles.loaderItem} />
       </Box>
     </Container>
   );

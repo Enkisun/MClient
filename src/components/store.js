@@ -1,7 +1,7 @@
+import { combineReducers } from "redux";
 import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import { persistStore, persistReducer, PERSIST, REGISTER } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-import { combineReducers } from "redux";
 import { authReducer } from "../slices/authSlice";
 
 const authConfig = {
