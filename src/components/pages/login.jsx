@@ -21,7 +21,7 @@ const useStyles = makeStyles(
 			marginBottom: theme.spacing(3),
 		},
 		formData: {
-			marginBottom: theme.spacing(5),
+			marginBottom: theme.spacing(2),
 		},
 		field: {
 			marginBottom: theme.spacing(2),

@@ -7,6 +7,7 @@ import Layout from '../modules/layout';
 import LoginPage from './pages/login';
 import RegisterPage from './pages/register';
 import HomePage from './pages/home';
+import TransactionsPage from './pages/transactions';
 import ProtectedRoute from './elements/protectedRoute';
 
 const App = () => (
@@ -16,6 +17,7 @@ const App = () => (
 			<Switch>
 				<Layout>
 					<ProtectedRoute path="/home" component={HomePage} />
+					<ProtectedRoute path="/transactions" component={TransactionsPage} />
 					<Route path="/register">
 						<RegisterPage />
 					</Route>

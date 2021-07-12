@@ -12,6 +12,13 @@ const theme = createMuiTheme({
 			main: '#f9b934',
 			dark: '#c28900',
 		},
+		text: {
+			primary: '#1a202c',
+			secondary: '#fff',
+		},
+		background: {
+			default: '#fff',
+		},
 		action: {
 			disabledBackground: '#000',
 		},
@@ -19,10 +26,33 @@ const theme = createMuiTheme({
 	typography: {
 		button: {
 			fontSize: '1rem',
+			textTransform: 'none',
 		},
 		h1: {
 			fontSize: '1.5rem',
 			color: '#fff',
+		},
+	},
+	overrides: {
+		MuiFormLabel: {
+			root: {
+				color: '#1a202c',
+			},
+		},
+		MuiBottomNavigation: {
+			root: {
+				backgroundColor: '#1a202c',
+			},
+		},
+		MuiBottomNavigationAction: {
+			root: {
+				minWidth: 0,
+				padding: 0,
+				color: '#fff',
+				'&$selected': {
+					color: '#f9b934',
+				},
+			},
 		},
 	},
 	breakpoints: {
