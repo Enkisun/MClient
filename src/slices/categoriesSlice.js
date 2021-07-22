@@ -21,7 +21,6 @@ export const getCategories = createAsyncThunk(
 export const createCategory = createAsyncThunk(
 	'category/createCategory',
 	async ({ category }, { getState, rejectWithValue }) => {
-		console.log(1, category);
 		const { spaceId, id } = getState().auth.user;
 
 		try {

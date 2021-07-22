@@ -10,9 +10,7 @@ const HomePage = () => {
 			{/* <Button variant="contained" href="/categories" component={Link}>
 				Categories
 			</Button> */}
-			{data.length !== 0 && (
-				<TransactionsChartPie data={data} setData={setData} />
-			)}
+			<TransactionsChartPie data={data} setData={setData} />
 			<LatestTransactions />
 		</>
 	);

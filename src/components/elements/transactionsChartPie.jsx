@@ -66,6 +66,8 @@ const TransactionsChartPie = ({ data, setData }) => {
 		setData([...reduceCategories(transactions, categories)]);
 	}, [transactions, categories]);
 
+	if (!transactions) return <></>;
+
 	return (
 		<ResponsiveContainer width="100%" aspect={1} className={styles.container}>
 			<PieChart>
