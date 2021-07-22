@@ -16,7 +16,7 @@ export const fetchGetExpenses = async ({ from, to, spaceId, id }) =>
 
 export const fetchCreateExpense = async (
 	amount,
-	category,
+	categoryId,
 	date,
 	note,
 	spaceId,
@@ -24,7 +24,7 @@ export const fetchCreateExpense = async (
 ) =>
 	await axios.post(`/transactions`, {
 		amount,
-		category,
+		categoryId,
 		date,
 		note,
 		spaceId,

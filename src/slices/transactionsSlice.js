@@ -31,10 +31,10 @@ export const getExpenses = createAsyncThunk(
 
 export const createExpense = createAsyncThunk(
 	'transaction/createExpense',
-	async ({ amount, category, date, note }, { getState, rejectWithValue }) => {
+	async ({ amount, categoryId, date, note }, { getState, rejectWithValue }) => {
 		const { spaceId, id } = getState().auth.user;
 		try {
-			await fetchCreateExpense(amount, category, date, note, spaceId, id);
+			await fetchCreateExpense(amount, categoryId, date, note, spaceId, id);
 		} catch (e) {
 			if (!e.response) {
 				return rejectWithValue(e.message);

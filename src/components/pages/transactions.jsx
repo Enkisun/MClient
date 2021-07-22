@@ -146,9 +146,14 @@ const TransactionsPage = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		const getCategory = categories.find((item) => item.name === category);
 
 		try {
-			unwrapResult(await dispatch(createExpense({ ...state, date, category })));
+			unwrapResult(
+				await dispatch(
+					createExpense({ ...state, date, categoryId: getCategory._id })
+				)
+			);
 			history.push('/home');
 		} catch (errData) {
 			return setError(errData);
@@ -264,7 +269,8 @@ const TransactionsPage = () => {
 					!category ||
 					!date ||
 					!!error ||
-					new Date(date) > new Date()
+					new Date(date) > new Date() ||
+					category === 'New'
 				}
 				text="Create"
 			/>
