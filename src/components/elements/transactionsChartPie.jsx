@@ -1,12 +1,8 @@
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { makeStyles } from '@material-ui/core/styles';
-import {
-	getExpenses,
-	transactionsSelectors,
-} from '../../slices/transactionsSlice';
-import { getCategories } from '../../slices/categoriesSlice';
+import { transactionsSelectors } from '../../slices/transactionsSlice';
 import reduceCategories from '../../utils/categories.utils';
 
 const useStyles = makeStyles(
@@ -51,19 +47,11 @@ const renderCustomizedLabel = ({
 
 const TransactionsChartPie = ({ data, setData }) => {
 	const styles = useStyles();
-	const dispatch = useDispatch();
 	const { categories } = useSelector((s) => s.categories);
 	const transactions = useSelector(transactionsSelectors.selectAll);
 
 	useEffect(() => {
-		if (!transactions || !categories) {
-			dispatch(getCategories());
-			dispatch(getExpenses({ from: '', to: '' }));
-		}
-	}, []);
-
-	useEffect(() => {
-		if (!transactions.length) {
+		if (!transactions.length || !categories.length) {
 			setData([{ name: '', value: 1 }]);
 		} else {
 			setData([...reduceCategories(transactions, categories)]);
