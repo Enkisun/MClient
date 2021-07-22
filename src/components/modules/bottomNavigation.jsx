@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router';
+import { useLocation } from 'react-router';
 import { makeStyles } from '@material-ui/core/styles';
 import {
-	BottomNavigation,
+	BottomNavigation as BottomNavigationMaterialUi,
 	BottomNavigationAction,
 	Link,
 } from '@material-ui/core';
@@ -30,25 +30,25 @@ const useStyles = makeStyles(
 		},
 	}),
 	{
-		name: 'Footer',
+		name: 'BottomNavigation',
 	}
 );
 
-const Footer = () => {
-	const history = useHistory();
+const BottomNavigation = () => {
+	const location = useLocation();
 	const styles = useStyles();
 	const [value, setValue] = useState('');
 
 	useEffect(() => {
-		setValue(history.location.pathname);
-	}, [history]);
+		setValue(location.pathname);
+	}, [location]);
 
 	const handleChange = (event, newValue) => {
 		setValue(newValue);
 	};
 
 	return (
-		<BottomNavigation
+		<BottomNavigationMaterialUi
 			value={value}
 			onChange={handleChange}
 			className={styles.container}
@@ -93,8 +93,8 @@ const Footer = () => {
 				icon={<SettingsIcon />}
 				component={Link}
 			/>
-		</BottomNavigation>
+		</BottomNavigationMaterialUi>
 	);
 };
 
-export default Footer;
+export default BottomNavigation;

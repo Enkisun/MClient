@@ -1,33 +1,18 @@
-import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { Button, Link } from '@material-ui/core';
-import { logout } from '../../slices/authSlice';
-import ChartPie from '../../modules/charts/chartPie';
-import LatestTransactions from '../../modules/latestTransactions';
-import { getExpenses } from '../../slices/transactionsSlice';
-import { getCategories } from '../../slices/categoriesSlice';
+import React, { useState } from 'react';
+// import { Button, Link } from '@material-ui/core';
+import TransactionsChartPie from '../elements/transactionsChartPie';
+import LatestTransactions from '../modules/latestTransactions';
 
 const HomePage = () => {
-	const dispatch = useDispatch();
-
-	useEffect(() => {
-		dispatch(getExpenses({ from: '', to: '' }));
-		dispatch(getCategories());
-	}, []);
-
-	const handleLoggedOut = () => {
-		dispatch(logout());
-	};
-
+	const [data, setData] = useState([]);
 	return (
 		<>
-			<Button onClick={handleLoggedOut} variant="contained">
-				Logout
-			</Button>
-			<Button variant="contained" href="/transactions" component={Link}>
-				&#43; Add a transaction
-			</Button>
-			<ChartPie />
+			{/* <Button variant="contained" href="/categories" component={Link}>
+				Categories
+			</Button> */}
+			{data.length !== 0 && (
+				<TransactionsChartPie data={data} setData={setData} />
+			)}
 			<LatestTransactions />
 		</>
 	);

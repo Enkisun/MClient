@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { Box, Paper, makeStyles } from '@material-ui/core';
 import Header from './header';
-import Footer from './footer';
+import BottomNavigation from './bottomNavigation';
 
 const useStyles = makeStyles(
 	(theme) => ({
@@ -30,11 +30,11 @@ const Layout = ({ children }) => {
 
 	return (
 		<Box className={styles.container}>
-			<Header />
+			<Header isAuth={!!token} />
 			<Paper component="main" className={styles.main}>
 				{children}
 			</Paper>
-			{token && <Footer />}
+			{!!token && <BottomNavigation />}
 		</Box>
 	);
 };

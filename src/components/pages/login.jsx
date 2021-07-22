@@ -5,7 +5,7 @@ import { Box, TextField, Button, Typography, Link } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { login } from '../../slices/authSlice';
-import Loader from '../elements/loader';
+import SubmitButton from '../ui-kit/submitButton';
 
 const useStyles = makeStyles(
 	(theme) => ({
@@ -21,7 +21,7 @@ const useStyles = makeStyles(
 			marginBottom: theme.spacing(3),
 		},
 		formData: {
-			marginBottom: theme.spacing(2),
+			marginBottom: theme.spacing(5),
 		},
 		field: {
 			marginBottom: theme.spacing(2),
@@ -31,9 +31,6 @@ const useStyles = makeStyles(
 		},
 		submitWrapper: {
 			width: '100%',
-		},
-		submit: {
-			height: 42,
 		},
 		link: {
 			color: theme.palette.secondary.main,
@@ -149,16 +146,11 @@ const LoginPage = () => {
 				</Box>
 			</Box>
 			<Box className={styles.submitWrapper}>
-				<Button
-					className={styles.submit}
-					disabled={isLoading}
-					variant="contained"
-					type="submit"
-					color="primary"
-					fullWidth
-				>
-					{isLoading ? <Loader /> : `Sign in`}
-				</Button>
+				<SubmitButton
+					isLoading={isLoading}
+					disabled={!email || !password}
+					text="Sign in"
+				/>
 				<Button
 					className={`${styles.link} ${styles.forgot}`}
 					href="/login"

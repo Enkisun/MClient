@@ -33,3 +33,10 @@ export const fetchCreateExpense = async (
 
 export const fetchGetCategories = async ({ spaceId, id }) =>
 	await axios.get(`/categories?spaceId=${spaceId}&id=${id}`);
+
+export const fetchCreateCategory = async (category, spaceId, id) =>
+	await axios.post(`/categories`, {
+		category,
+		spaceId,
+		id,
+	});

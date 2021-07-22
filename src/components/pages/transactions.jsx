@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { unwrapResult } from '@reduxjs/toolkit';
 import {
 	Box,
-	Button,
-	Link,
 	Typography,
 	TextField,
-	MenuItem,
 	Grid,
+	Paper,
+	IconButton,
 } from '@material-ui/core';
+import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
 import {
@@ -17,8 +19,10 @@ import {
 	KeyboardDatePicker,
 } from '@material-ui/pickers';
 import { makeStyles } from '@material-ui/core/styles';
+import AddCircleIcon from '@material-ui/icons/AddCircle';
 import { createExpense } from '../../slices/transactionsSlice';
 import { getCategories } from '../../slices/categoriesSlice';
+import SubmitButton from '../ui-kit/submitButton';
 
 const useStyles = makeStyles((theme) => ({
 	form: {
@@ -29,61 +33,123 @@ const useStyles = makeStyles((theme) => ({
 	titleWrapper: {
 		display: 'flex',
 		alignItems: 'center',
+		justifyContent: 'center',
 		marginBottom: theme.spacing(4),
 	},
-	formDataWrapper: {
+	formData: {
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'center',
-		marginBottom: theme.spacing(2),
+		marginBottom: theme.spacing(5),
 	},
-	formElement: {
+	amountWrapper: {
+		display: 'flex',
+		justifyContent: 'space-between',
+		alignItems: 'flex-start',
 		marginBottom: theme.spacing(2),
+		width: '100%',
+	},
+	fieldAmount: {
+		flexGrow: 1,
+		marginRight: theme.spacing(1),
+		'& fieldset': {
+			borderRadius: theme.spacing(2),
+		},
+	},
+	field: {
+		marginBottom: theme.spacing(2),
+		'& fieldset': {
+			borderRadius: theme.spacing(2),
+		},
+	},
+	categoriesWrapper: {
+		width: '100%',
+		borderRadius: theme.spacing(2),
+		padding: theme.spacing(2),
+		boxShadow: '0px 0px 0px 1px rgb(0 0 0 / 20%)',
+		marginBottom: (props) => theme.spacing(props.error ? 2 : 0),
+	},
+	categoriesTitle: {
+		marginBottom: theme.spacing(1),
+	},
+	categoriesGroup: {
+		flexGrow: 1,
+		flexWrap: 'wrap',
+	},
+	categoryButton: {
+		flexGrow: 1,
+		maxWidth: '33.3%',
+		width: '100%',
+	},
+	gridItem: {
+		overflow: 'hidden',
+	},
+	category: {
+		overflow: 'hidden',
+		textOverflow: 'ellipsis',
+	},
+	newCategoryButton: {
+		flex: '1 0 auto',
+		padding: 0,
+	},
+	newCategoryIconWrapper: {
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+	},
+	newCategoryIcon: {
+		transform: 'scale(1.3)',
+		marginBottom: theme.spacing(1),
 	},
 }));
 
 const TransactionsPage = () => {
-	const styles = useStyles();
+	const history = useHistory();
 	const dispatch = useDispatch();
 	const { categories } = useSelector((s) => s.categories);
+	const { isLoading } = useSelector((s) => s.transactions);
 
-	const [amount, setAmount] = useState('');
-	const [category, setCategory] = useState('');
-	const [note, setNote] = useState('');
+	const [state, setState] = useState({ amount: '', note: '' });
+	const [category, setCategory] = useState('New');
 	const [date, setDate] = useState(new Date());
 	const [error, setError] = useState('');
 
+	const styles = useStyles({ error: !!error });
+
 	useEffect(() => {
-		dispatch(getCategories());
+		const fetch = () => {
+			dispatch(getCategories()).then((response) =>
+				setCategory(response.payload[0].name)
+			);
+		};
+		fetch();
 	}, []);
+
+	const handler = (e) => {
+		setState((prevState) => ({
+			...prevState,
+			[e.target.name]: e.target.value,
+		}));
+		setError('');
+	};
 
 	const handleDateChange = (value) => {
 		setDate(value);
 		setError('');
 	};
 
-	const handleAmountChange = (e) => {
-		setAmount(e.target.value);
-		setError('');
-	};
-
-	const handleCategoryChange = (e) => {
-		setCategory(e.target.value);
-		setError('');
-	};
-
-	const handleNoteChange = (e) => {
-		setNote(e.target.value);
-		setError('');
+	const handleCategoryChange = (event, newCategory) => {
+		if (newCategory) {
+			setCategory(newCategory);
+		}
 	};
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
 		try {
-			unwrapResult(
-				await dispatch(createExpense({ amount, category, date, note }))
-			);
+			unwrapResult(await dispatch(createExpense({ ...state, date, category })));
+			history.push('/home');
 		} catch (errData) {
 			return setError(errData);
 		}
@@ -92,89 +158,116 @@ const TransactionsPage = () => {
 	return (
 		<form className={styles.form} onSubmit={handleSubmit}>
 			<Box className={styles.titleWrapper}>
-				<Button variant="contained" href="/home" component={Link}>
-					Back
-				</Button>
-				<Typography variant="h5">New expense</Typography>
+				<Typography variant="h5">New transaction</Typography>
 			</Box>
-			<Box className={styles.formDataWrapper}>
-				<TextField
-					id="amount"
-					name="amount"
-					value={amount}
-					onChange={handleAmountChange}
-					className={styles.formElement}
-					inputProps={{ min: '0.01', step: '0.01' }}
-					type="number"
-					label="Expense amount"
-					variant="outlined"
-					inputMode="numeric"
-					fullWidth
-					autoComplete="off"
-					required
-				/>
-				<TextField
-					select
-					id="category"
-					value={category}
-					onChange={handleCategoryChange}
-					className={styles.formElement}
-					label="Select category"
-					variant="outlined"
-					fullWidth
-					required
-					SelectProps={{
-						MenuProps: {
-							anchorOrigin: {
-								vertical: 'bottom',
-								horizontal: 'left',
-							},
-							getContentAnchorEl: null,
-						},
-					}}
-				>
-					{categories.map((item) => (
-						<MenuItem key={item._id} value={item.name}>
-							{item.name}
-						</MenuItem>
-					))}
-				</TextField>
-				<MuiPickersUtilsProvider utils={DateFnsUtils}>
-					<Grid
-						className={styles.formElement}
-						container
-						justifycontent="space-around"
-					>
-						<KeyboardDatePicker
-							margin="normal"
-							id="date-picker-dialog"
-							label="Select date"
-							format="MM/dd/yyyy"
-							value={date}
-							onChange={handleDateChange}
-							KeyboardButtonProps={{
-								'aria-label': 'change date',
-							}}
-							maxDate={new Date()}
-							fullWidth
-							required
-						/>
-					</Grid>
-				</MuiPickersUtilsProvider>
+			<Box className={styles.formData}>
+				<Grid className={styles.amountWrapper}>
+					<TextField
+						id="amount"
+						name="amount"
+						value={state.amount}
+						onChange={handler}
+						inputProps={{ min: '0.01', step: '0.01', width: 'auto' }}
+						className={styles.fieldAmount}
+						type="number"
+						label="Amount"
+						variant="outlined"
+						inputMode="numeric"
+						autoComplete="off"
+						required
+					/>
+					<MuiPickersUtilsProvider utils={DateFnsUtils}>
+						<Box justifycontent="space-around">
+							<KeyboardDatePicker
+								id="date-picker-dialog"
+								label="Date"
+								format="MM/dd/yyyy"
+								name="date"
+								value={date}
+								onChange={handleDateChange}
+								KeyboardButtonProps={{
+									'aria-label': 'Change date',
+								}}
+								maxDate={new Date()}
+								inputVariant="outlined"
+								fullWidth
+								required
+							/>
+						</Box>
+					</MuiPickersUtilsProvider>
+				</Grid>
 				<TextField
 					id="note"
+					name="note"
 					label="Note"
-					value={note}
-					onChange={handleNoteChange}
-					className={styles.formElement}
+					value={state.note}
+					onChange={handler}
+					className={styles.field}
 					placeholder="Description"
+					variant="outlined"
+					autoComplete="off"
 					fullWidth
 				/>
+				<Paper elevation={0} className={styles.categoriesWrapper}>
+					<Typography className={styles.categoriesTitle}>Category *</Typography>
+					<Grid container>
+						<ToggleButtonGroup
+							value={category}
+							exclusive
+							onChange={handleCategoryChange}
+							className={styles.categoriesGroup}
+							aria-label="text alignment"
+						>
+							{categories.map((item) => (
+								<ToggleButton
+									value={item.name}
+									aria-label="left aligned"
+									className={styles.categoryButton}
+									key={item.name}
+								>
+									<Grid item className={styles.gridItem}>
+										{item.emoji}
+										<Typography className={styles.category}>
+											{item.name}
+										</Typography>
+									</Grid>
+								</ToggleButton>
+							))}
+							<ToggleButton
+								className={styles.categoryButton}
+								value="New"
+								aria-label="new"
+							>
+								<IconButton
+									className={styles.newCategoryButton}
+									to={{
+										pathname: '/new-category',
+										state: { prevRoute: history.location.pathname },
+									}}
+									component={Link}
+								>
+									<Box className={styles.newCategoryIconWrapper}>
+										<AddCircleIcon className={styles.newCategoryIcon} />
+										<Typography>New</Typography>
+									</Box>
+								</IconButton>
+							</ToggleButton>
+						</ToggleButtonGroup>
+					</Grid>
+				</Paper>
 				{!!error && <Typography color="error">{error}</Typography>}
 			</Box>
-			<Button variant="contained" type="submit">
-				Create
-			</Button>
+			<SubmitButton
+				isLoading={isLoading}
+				disabled={
+					!state.amount ||
+					!category ||
+					!date ||
+					!!error ||
+					new Date(date) > new Date()
+				}
+				text="Create"
+			/>
 		</form>
 	);
 };

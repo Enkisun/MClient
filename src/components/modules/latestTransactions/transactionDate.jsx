@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Typography } from '@material-ui/core';
 
-const ConvertDate = ({ date }) => {
+const TransactionDate = ({ className, date }) => {
 	const [convertedDate, setConvertedDate] = useState();
 
 	const lastTransactionDate = (newDate) => {
@@ -17,7 +17,7 @@ const ConvertDate = ({ date }) => {
 		setConvertedDate(lastTransactionDate(new Date(date)));
 	}, [date]);
 
-	return <Typography>{convertedDate}</Typography>;
+	return <Typography className={className}>{convertedDate}</Typography>;
 };
 
-export default ConvertDate;
+export default TransactionDate;

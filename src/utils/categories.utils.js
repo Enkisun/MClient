@@ -1,6 +1,7 @@
-const reduceCategories = (transactions, categories) =>
-	transactions.reduce((acc, el) => {
-		const category = categories.find((item) => item._id === el.categoryId);
+const reduceCategories = (transactions, categories) => {
+	if (!categories.length) return [];
+	const categoryData = transactions.reduce((acc, el) => {
+		const category = categories.find((i) => i._id === el.categoryId);
 		if (acc[el.categoryId]) {
 			return {
 				...acc,
@@ -15,5 +16,7 @@ const reduceCategories = (transactions, categories) =>
 			[el.categoryId]: { name: category.name, value: el.amount },
 		};
 	}, {});
+	return Object.values(categoryData);
+};
 
 export default reduceCategories;

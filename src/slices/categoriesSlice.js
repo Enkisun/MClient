@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { fetchGetCategories } from '../api/api';
+import { fetchCreateCategory, fetchGetCategories } from '../api/api';
 
 export const getCategories = createAsyncThunk(
 	'category/getCategories',
@@ -18,11 +18,25 @@ export const getCategories = createAsyncThunk(
 	}
 );
 
+export const createCategory = createAsyncThunk(
+	'category/createCategory',
+	async ({ category }, { getState, rejectWithValue }) => {
+		const { spaceId, id } = getState().auth.user;
+
+		try {
+			await fetchCreateCategory(category, spaceId, id);
+		} catch (e) {
+			return rejectWithValue(e.message);
+		}
+	}
+);
+
 export const categoriesSlice = createSlice({
 	name: 'category',
 	initialState: {
 		categories: [],
 		isLoading: false,
+		isNewCategory: false,
 	},
 	extraReducers: {
 		[getCategories.pending]: (state) => {
@@ -33,6 +47,15 @@ export const categoriesSlice = createSlice({
 			state.isLoading = false;
 		},
 		[getCategories.rejected]: (state) => {
+			state.isLoading = false;
+		},
+		[createCategory.pending]: (state) => {
+			state.isLoading = true;
+		},
+		[createCategory.fulfilled]: (state) => {
+			state.isLoading = false;
+		},
+		[createCategory.rejected]: (state) => {
 			state.isLoading = false;
 		},
 	},

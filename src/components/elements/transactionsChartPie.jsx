@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { makeStyles } from '@material-ui/core/styles';
-import reduceCategories from '../../utils/reduceCategories';
+import {
+	getExpenses,
+	transactionsSelectors,
+} from '../../slices/transactionsSlice';
+import { getCategories } from '../../slices/categoriesSlice';
+import reduceCategories from '../../utils/categories.utils';
 
 const useStyles = makeStyles(
 	() => ({
@@ -44,17 +49,22 @@ const renderCustomizedLabel = ({
 	);
 };
 
-const ChartPie = () => {
+const TransactionsChartPie = ({ data, setData }) => {
 	const styles = useStyles();
-	const [data, setData] = useState([]);
+	const dispatch = useDispatch();
 	const { categories } = useSelector((s) => s.categories);
-	const { transactions } = useSelector((s) => s.transactions);
+	const transactions = useSelector(transactionsSelectors.selectAll);
 
 	useEffect(() => {
-		if (categories.length) {
-			setData(Object.values(reduceCategories(transactions, categories)));
+		if (!transactions || !categories) {
+			dispatch(getCategories());
+			dispatch(getExpenses({ from: '', to: '' }));
 		}
-	}, [categories, transactions]);
+	}, []);
+
+	useEffect(() => {
+		setData([...reduceCategories(transactions, categories)]);
+	}, [transactions, categories]);
 
 	return (
 		<ResponsiveContainer width="100%" aspect={1} className={styles.container}>
@@ -82,4 +92,4 @@ const ChartPie = () => {
 	);
 };
 
-export default ChartPie;
+export default TransactionsChartPie;

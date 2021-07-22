@@ -1,9 +1,9 @@
-import { createMuiTheme } from '@material-ui/core/styles';
+import { createTheme } from '@material-ui/core/styles';
 
-const theme = createMuiTheme({
+const theme = createTheme({
 	palette: {
 		primary: {
-			light: '#90caf9',
+			light: '#fff',
 			main: '#1a202c',
 			dark: '#000',
 		},
@@ -20,7 +20,7 @@ const theme = createMuiTheme({
 			default: '#fff',
 		},
 		action: {
-			disabledBackground: '#000',
+			disabledBackground: '#d1d1d3',
 		},
 	},
 	typography: {
@@ -37,6 +37,61 @@ const theme = createMuiTheme({
 		MuiFormLabel: {
 			root: {
 				color: '#1a202c',
+			},
+		},
+		MuiOutlinedInput: {
+			root: {
+				borderRadius: 16,
+			},
+			adornedEnd: {
+				paddingRight: 0,
+			},
+		},
+		MuiListItemIcon: {
+			root: {
+				color: 'initial',
+				minWidth: 'initial',
+			},
+		},
+		MuiListItemText: {
+			root: {
+				flex: 'initial',
+			},
+		},
+		MuiToggleButtonGroup: {
+			groupedHorizontal: {
+				'&:not(:first-child)': {
+					borderTopRightRadius: 8,
+					borderTopLeftRadius: 8,
+					borderBottomRightRadius: 8,
+					borderBottomLeftRadius: 8,
+				},
+				'&:not(:last-child)': {
+					borderTopRightRadius: 8,
+					borderTopLeftRadius: 8,
+					borderBottomRightRadius: 8,
+					borderBottomLeftRadius: 8,
+				},
+			},
+		},
+		MuiButton: {
+			contained: {
+				'&:hover': {
+					'&:disabled': {
+						boxShadow: 'none',
+					},
+				},
+			},
+		},
+		MuiToggleButton: {
+			root: {
+				border: 'none',
+				'&$selected': {
+					color: 'initial',
+					'&:hover': {
+						borderRadius: 8,
+					},
+				},
 			},
 		},
 		MuiBottomNavigation: {

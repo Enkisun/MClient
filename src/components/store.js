@@ -35,4 +35,6 @@ export const store = configureStore({
 	}),
 });
 
+window.store = store;
+
 export const persistor = persistStore(store);

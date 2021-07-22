@@ -5,7 +5,7 @@ import { Box, TextField, Button, Typography, Link } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { register } from '../../slices/authSlice';
-import Loader from '../elements/loader';
+import SubmitButton from '../ui-kit/submitButton';
 
 const useStyles = makeStyles(
 	(theme) => ({
@@ -31,9 +31,6 @@ const useStyles = makeStyles(
 		},
 		submitWrapper: {
 			width: '100%',
-		},
-		submit: {
-			height: 42,
 		},
 		link: {
 			color: theme.palette.secondary.main,
@@ -72,6 +69,24 @@ const RegisterPage = () => {
 		}
 	}, [token, history]);
 
+	const handleEmail = (e) => {
+		setEmail(e.target.value);
+		setEmailError('');
+		setError('');
+	};
+
+	const handlePassword = (e) => {
+		setPassword(e.target.value);
+		setPasswordError('');
+		setError('');
+	};
+
+	const handleConfirm = (e) => {
+		setConfirm(e.target.value);
+		setPasswordError('');
+		setError('');
+	};
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
@@ -97,24 +112,6 @@ const RegisterPage = () => {
 				return setPasswordError(errData.errors[1].msg);
 			}
 		}
-	};
-
-	const handleEmail = (e) => {
-		setEmail(e.target.value);
-		setEmailError('');
-		setError('');
-	};
-
-	const handlePassword = (e) => {
-		setPassword(e.target.value);
-		setPasswordError('');
-		setError('');
-	};
-
-	const handleConfirm = (e) => {
-		setConfirm(e.target.value);
-		setPasswordError('');
-		setError('');
 	};
 
 	return (
@@ -179,15 +176,11 @@ const RegisterPage = () => {
 				</Box>
 			</Box>
 			<Box className={styles.submitWrapper}>
-				<Button
-					className={styles.submit}
-					variant="contained"
-					type="submit"
-					color="primary"
-					fullWidth
-				>
-					{isLoading ? <Loader /> : `Sign up`}
-				</Button>
+				<SubmitButton
+					isLoading={isLoading}
+					disabled={!email || !password || !confirm}
+					text="Sign up"
+				/>
 				<Box className={styles.loginWrapper}>
 					<Typography>Do you have an account?</Typography>
 					<Button className={styles.link} href="/login" component={Link}>
