@@ -32,7 +32,7 @@ const renderCustomizedLabel = ({
 	percent,
 	name,
 }) => {
-	const radius = innerRadius + (outerRadius - innerRadius) * 0.7;
+	const radius = innerRadius + (outerRadius - innerRadius) * 0.3;
 	const x = cx + radius * Math.cos(-midAngle * RADIAN);
 	const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
@@ -41,7 +41,7 @@ const renderCustomizedLabel = ({
 			x={x}
 			y={y}
 			fill="white"
-			textAnchor={x > cx ? 'middle' : 'start'}
+			textAnchor={x > cx ? 'start' : 'end'}
 			dominantBaseline="central"
 		>
 			{percent > 0.07 && `${name} ${(percent * 100).toFixed(0)}%`}
@@ -63,10 +63,12 @@ const TransactionsChartPie = ({ data, setData }) => {
 	}, []);
 
 	useEffect(() => {
-		setData([...reduceCategories(transactions, categories)]);
+		if (!transactions.length) {
+			setData([{ name: '', value: 1 }]);
+		} else {
+			setData([...reduceCategories(transactions, categories)]);
+		}
 	}, [transactions, categories]);
-
-	if (!transactions) return <></>;
 
 	return (
 		<ResponsiveContainer width="100%" aspect={1} className={styles.container}>
