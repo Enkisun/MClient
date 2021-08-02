@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { Controller, useForm } from 'react-hook-form';
 import { Box, TextField, Button, Typography, Link } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { login } from '../../slices/authSlice';
-import SubmitButton from '../ui-kit/submitButton';
+import SubmitButton from '../elements/submitButton';
 
 const useStyles = makeStyles(
 	(theme) => ({
@@ -53,17 +54,28 @@ const useStyles = makeStyles(
 
 const LoginPage = () => {
 	const history = useHistory();
-
 	const dispatch = useDispatch();
 	const { isLoading, token } = useSelector((s) => s.auth);
+	const [formError, setFormError] = useState('');
+	const styles = useStyles({ error: !!formError });
 
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
-	const [error, setError] = useState('');
-	const [emailError, setEmailError] = useState('');
-	const [passwordError, setPasswordError] = useState('');
-
-	const styles = useStyles({ error: !!error });
+	const {
+		handleSubmit,
+		setValue,
+		setError,
+		clearErrors,
+		watch,
+		reset,
+		control,
+		formState: { errors },
+	} = useForm({
+		defaultValues: {
+			email: '',
+			password: '',
+		},
+	});
+	const watchFields = watch(['email', 'password']);
+	const isEmptyFields = watchFields.every((i) => i);
 
 	useEffect(() => {
 		if (token) {
@@ -71,84 +83,109 @@ const LoginPage = () => {
 		}
 	}, [token, history]);
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
+	const handleChangeEmail = (e) => {
+		setValue('email', e.target.value);
+		setFormError('');
+		clearErrors();
+	};
 
+	const handleChangePassword = (e) => {
+		setValue('password', e.target.value);
+		setFormError('');
+		clearErrors();
+	};
+
+	const resetFields = () => {
+		reset({ email: '', password: '' }, { keepErrors: true });
+	};
+
+	const onSubmit = async (data) => {
 		try {
-			unwrapResult(await dispatch(login({ email, password })));
+			unwrapResult(await dispatch(login({ ...data })));
 			history.push('/home');
 		} catch (errData) {
+			resetFields();
 			if (!errData.errors) {
-				return setError(errData.message ? errData.message : errData);
+				return setFormError(errData.message ? errData.message : errData);
 			}
 
+			if (errData.message) setFormError(errData.message);
 			if (errData.errors[0].param === 'email') {
-				setEmailError(errData.errors[0].msg);
-			} else setPasswordError(errData.errors[0].msg);
+				setError('email', {
+					type: 'server',
+					message: errData.errors[0].msg,
+				});
+			} else {
+				setError('password', {
+					type: 'server',
+					message: errData.errors[0].msg,
+				});
+			}
 
 			if (errData.errors[1]) {
-				return setPasswordError(errData.errors[1].msg);
+				setError('password', {
+					type: 'server',
+					message: errData.errors[1].msg,
+				});
 			}
 		}
 	};
 
-	const handleEmail = (e) => {
-		setEmail(e.target.value);
-		setEmailError('');
-		setError('');
-	};
-
-	const handlePassword = (e) => {
-		setPassword(e.target.value);
-		setPasswordError('');
-		setError('');
-	};
-
 	return (
-		<form className={styles.form} onSubmit={handleSubmit}>
+		<form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
 			<Box>
 				<Typography className={styles.title} variant="h4">
 					Sign in
 				</Typography>
 				<Box className={styles.formData}>
-					<TextField
-						id="email"
+					<Controller
 						name="email"
-						value={email}
-						onChange={handleEmail}
-						error={!!emailError}
-						helperText={emailError}
-						label="Email"
-						placeholder="Enter your email"
-						variant="outlined"
-						type="email"
-						className={styles.field}
-						autoFocus
-						fullWidth
-						required
+						control={control}
+						render={({ field }) => (
+							<TextField
+								label="Email"
+								value={field.email}
+								{...field}
+								onChange={handleChangeEmail}
+								className={styles.field}
+								error={errors.email && !!errors.email.message}
+								helperText={errors.email && errors.email.message}
+								placeholder="Enter your email"
+								variant="outlined"
+								type="email"
+								autoFocus
+								fullWidth
+								required
+							/>
+						)}
 					/>
-					<TextField
-						id="password"
+					<Controller
 						name="password"
-						value={password}
-						onChange={handlePassword}
-						error={!!passwordError}
-						helperText={passwordError}
-						label="Password"
-						placeholder="Enter your password"
-						variant="outlined"
-						type="password"
-						className={styles.field}
-						fullWidth
-						required
+						control={control}
+						render={({ field }) => (
+							<TextField
+								label="Password"
+								value={field.password}
+								{...field}
+								onChange={handleChangePassword}
+								className={styles.field}
+								error={errors.password && !!errors.password.message}
+								helperText={errors.password && errors.password.message}
+								placeholder="Enter your password"
+								variant="outlined"
+								type="password"
+								fullWidth
+								required
+							/>
+						)}
 					/>
-					{!!error && <Typography color="error">{error}</Typography>}
+					{!!formError && <Typography color="error">{formError}</Typography>}
 				</Box>
 			</Box>
 			<Box className={styles.submitWrapper}>
 				<SubmitButton
 					isLoading={isLoading}
-					disabled={!email || !password}
+					disabled={!isEmptyFields || !!formError}
 					text="Sign in"
 				/>
 				<Button

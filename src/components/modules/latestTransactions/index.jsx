@@ -3,11 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Box, Typography, List, IconButton, Link } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import HistoryIcon from '@material-ui/icons/History';
-import {
-	getExpenses,
-	selectGroupedByDayTransactions,
-} from '../../../slices/transactionsSlice';
+import { getExpenses } from '../../../slices/transactionsSlice';
 import { getCategories } from '../../../slices/categoriesSlice';
+import selectors from '../../../selectors';
 import TransactionDate from './transactionDate';
 import Transaction from './transaction';
 
@@ -30,7 +28,7 @@ const useStyles = makeStyles(
 const LatestTransactions = () => {
 	const styles = useStyles();
 	const dispatch = useDispatch();
-	const transactions = useSelector(selectGroupedByDayTransactions);
+	const transactions = useSelector(selectors.selectGroupedByDayTransactions);
 
 	useEffect(() => {
 		dispatch(getExpenses({ from: '', to: '' }));
@@ -40,12 +38,11 @@ const LatestTransactions = () => {
 	return (
 		<>
 			<Box className={styles.titleWrapper}>
-				<Typography variant="h6">Latest Transactions</Typography>
+				<Typography variant="h5">Mounth Transactions</Typography>
 				<IconButton href="#" component={Link}>
 					<HistoryIcon />
 				</IconButton>
 			</Box>
-			<Typography>Last 30 days</Typography>
 			<List>
 				{transactions.map((item) => (
 					<Box key={item[0]}>

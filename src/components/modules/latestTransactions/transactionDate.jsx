@@ -17,7 +17,11 @@ const TransactionDate = ({ className, date }) => {
 		setConvertedDate(lastTransactionDate(new Date(date)));
 	}, [date]);
 
-	return <Typography className={className}>{convertedDate}</Typography>;
+	return (
+		<Typography variant="body1" className={className}>
+			{convertedDate}
+		</Typography>
+	);
 };
 
 export default TransactionDate;

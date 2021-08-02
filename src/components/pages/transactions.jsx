@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 import { Link } from 'react-router-dom';
+import { Controller, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { unwrapResult } from '@reduxjs/toolkit';
 import {
 	Box,
 	Typography,
 	TextField,
-	Grid,
 	Paper,
 	IconButton,
 } from '@material-ui/core';
@@ -20,20 +20,22 @@ import {
 } from '@material-ui/pickers';
 import { makeStyles } from '@material-ui/core/styles';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
+import {
+	categoriesSelectors,
+	getCategories,
+} from '../../slices/categoriesSlice';
 import { createExpense } from '../../slices/transactionsSlice';
-import { getCategories } from '../../slices/categoriesSlice';
-import SubmitButton from '../ui-kit/submitButton';
+import { getDynamicIcon } from '../../constants/iconNames';
+import SubmitButton from '../elements/submitButton';
 
 const useStyles = makeStyles((theme) => ({
 	form: {
 		display: 'flex',
 		flexDirection: 'column',
 		height: '100%',
+		textAlign: 'center',
 	},
 	titleWrapper: {
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'center',
 		marginBottom: theme.spacing(4),
 	},
 	formData: {
@@ -71,20 +73,20 @@ const useStyles = makeStyles((theme) => ({
 	},
 	categoriesTitle: {
 		marginBottom: theme.spacing(1),
+		textAlign: 'initial',
 	},
 	categoriesGroup: {
 		flexGrow: 1,
 		flexWrap: 'wrap',
+		width: '100%',
 	},
 	categoryButton: {
 		flexGrow: 1,
 		maxWidth: '33.3%',
 		width: '100%',
 	},
-	gridItem: {
-		overflow: 'hidden',
-	},
 	category: {
+		width: '100%',
 		overflow: 'hidden',
 		textOverflow: 'ellipsis',
 	},
@@ -92,186 +94,211 @@ const useStyles = makeStyles((theme) => ({
 		flex: '1 0 auto',
 		padding: 0,
 	},
-	newCategoryIconWrapper: {
+	categoryWrapper: {
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'center',
+		justifyContent: 'space-between',
+		overflow: 'hidden',
 	},
-	newCategoryIcon: {
-		transform: 'scale(1.3)',
+	categoryIcon: {
+		width: theme.spacing(4),
+		height: theme.spacing(4),
 		marginBottom: theme.spacing(1),
+		color: '#842645',
 	},
 }));
 
 const TransactionsPage = () => {
 	const history = useHistory();
 	const dispatch = useDispatch();
-	const { categories } = useSelector((s) => s.categories);
+	const categories = useSelector(categoriesSelectors.selectAll);
+	const { createdCategory } = useSelector((s) => s.categories);
 	const { isLoading } = useSelector((s) => s.transactions);
-
-	const [state, setState] = useState({ amount: '', note: '' });
-	const [category, setCategory] = useState('New');
-	const [date, setDate] = useState(new Date());
-	const [error, setError] = useState('');
-
-	const styles = useStyles({ error: !!error });
+	const [formError, setFormError] = useState('');
+	const styles = useStyles({ error: !!formError });
+	const { handleSubmit, setValue, watch, control } = useForm({
+		defaultValues: {
+			amount: '',
+			date: new Date(),
+			note: '',
+			categoryId: '',
+		},
+	});
+	const watchFields = watch(['amount', 'date', 'categoryId']);
+	const isEmptyFields = watchFields.every((i) => i);
 
 	useEffect(() => {
 		const fetch = () => {
-			dispatch(getCategories()).then((response) =>
-				setCategory(response.payload[0].name)
-			);
+			dispatch(getCategories()).then((response) => {
+				if (createdCategory && createdCategory._id) {
+					return setValue('categoryId', createdCategory._id);
+				}
+				setValue('categoryId', response.payload[0]._id);
+			});
 		};
 		fetch();
 	}, []);
 
-	const handler = (e) => {
-		setState((prevState) => ({
-			...prevState,
-			[e.target.name]: e.target.value,
-		}));
-		setError('');
+	const handleChangeAmount = (e) => {
+		setValue('amout', e.target.value);
+		setFormError('');
 	};
 
-	const handleDateChange = (value) => {
-		setDate(value);
-		setError('');
+	const handleChangeDate = (value) => {
+		setValue('date', value);
+		setFormError('');
 	};
 
-	const handleCategoryChange = (event, newCategory) => {
+	const handleChangeNote = (e) => {
+		setValue('note', e.target.value);
+		setFormError('');
+	};
+
+	const handleChangeCategory = (event, newCategory) => {
 		if (newCategory) {
-			setCategory(newCategory);
+			setValue('categoryId', newCategory);
 		}
+		setFormError('');
 	};
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		const getCategory = categories.find((item) => item.name === category);
-
+	const onSubmit = async (data) => {
 		try {
-			unwrapResult(
-				await dispatch(
-					createExpense({ ...state, date, categoryId: getCategory._id })
-				)
-			);
+			unwrapResult(await dispatch(createExpense({ ...data })));
 			history.push('/home');
 		} catch (errData) {
-			return setError(errData);
+			return setFormError(errData);
 		}
 	};
 
 	return (
-		<form className={styles.form} onSubmit={handleSubmit}>
+		<form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
 			<Box className={styles.titleWrapper}>
 				<Typography variant="h5">New transaction</Typography>
 			</Box>
 			<Box className={styles.formData}>
-				<Grid className={styles.amountWrapper}>
-					<TextField
-						id="amount"
+				<Box className={styles.amountWrapper}>
+					<Controller
 						name="amount"
-						value={state.amount}
-						onChange={handler}
-						inputProps={{ min: '0.01', step: '0.01', width: 'auto' }}
-						className={styles.fieldAmount}
-						type="number"
-						label="Amount"
-						variant="outlined"
-						inputMode="numeric"
-						autoComplete="off"
-						required
+						control={control}
+						render={({ field }) => (
+							<TextField
+								label="Amount"
+								value={field.amount}
+								onChange={handleChangeAmount}
+								className={styles.fieldAmount}
+								inputProps={{ min: '0.01', step: '0.01', width: 'auto' }}
+								type="number"
+								variant="outlined"
+								inputMode="numeric"
+								autoComplete="off"
+								required
+								{...field}
+							/>
+						)}
 					/>
 					<MuiPickersUtilsProvider utils={DateFnsUtils}>
 						<Box justifycontent="space-around">
-							<KeyboardDatePicker
-								id="date-picker-dialog"
-								label="Date"
-								format="MM/dd/yyyy"
+							<Controller
 								name="date"
-								value={date}
-								onChange={handleDateChange}
-								KeyboardButtonProps={{
-									'aria-label': 'Change date',
-								}}
-								maxDate={new Date()}
-								inputVariant="outlined"
-								fullWidth
-								required
+								control={control}
+								render={({ field: { ref, ...rest } }) => (
+									<KeyboardDatePicker
+										label="Date"
+										value={rest.date}
+										onChange={handleChangeDate}
+										KeyboardButtonProps={{
+											'aria-label': 'Change date',
+										}}
+										maxDate={new Date()}
+										format="MM/dd/yyyy"
+										inputVariant="outlined"
+										fullWidth
+										required
+										{...rest}
+									/>
+								)}
 							/>
 						</Box>
 					</MuiPickersUtilsProvider>
-				</Grid>
-				<TextField
-					id="note"
+				</Box>
+				<Controller
 					name="note"
-					label="Note"
-					value={state.note}
-					onChange={handler}
-					className={styles.field}
-					placeholder="Description"
-					variant="outlined"
-					autoComplete="off"
-					fullWidth
+					control={control}
+					render={({ field }) => (
+						<TextField
+							label="Note"
+							value={field.note}
+							onChange={handleChangeNote}
+							className={styles.field}
+							placeholder="Description"
+							variant="outlined"
+							autoComplete="off"
+							fullWidth
+							{...field}
+						/>
+					)}
 				/>
 				<Paper elevation={0} className={styles.categoriesWrapper}>
 					<Typography className={styles.categoriesTitle}>Category *</Typography>
-					<Grid container>
-						<ToggleButtonGroup
-							value={category}
-							exclusive
-							onChange={handleCategoryChange}
-							className={styles.categoriesGroup}
-							aria-label="text alignment"
-						>
-							{categories.map((item) => (
-								<ToggleButton
-									value={item.name}
-									aria-label="left aligned"
-									className={styles.categoryButton}
-									key={item.name}
-								>
-									<Grid item className={styles.gridItem}>
-										{item.emoji}
-										<Typography className={styles.category}>
-											{item.name}
-										</Typography>
-									</Grid>
-								</ToggleButton>
-							))}
-							<ToggleButton
-								className={styles.categoryButton}
-								value="New"
-								aria-label="new"
+					<Controller
+						name="categoryId"
+						control={control}
+						render={({ field }) => (
+							<ToggleButtonGroup
+								value={field.categoryId}
+								{...field}
+								onChange={handleChangeCategory}
+								className={styles.categoriesGroup}
+								aria-label="text alignment"
+								exclusive
 							>
-								<IconButton
-									className={styles.newCategoryButton}
-									to={{
-										pathname: '/new-category',
-										state: { prevRoute: history.location.pathname },
-									}}
-									component={Link}
+								{categories.map((item) => {
+									const DynamicIcon = getDynamicIcon(item.emoji);
+									return (
+										<ToggleButton
+											value={item._id}
+											aria-label="left aligned"
+											className={styles.categoryButton}
+											key={item._id}
+										>
+											<Box className={styles.categoryWrapper}>
+												<DynamicIcon className={styles.categoryIcon} />
+												<Typography className={styles.category}>
+													{item.name}
+												</Typography>
+											</Box>
+										</ToggleButton>
+									);
+								})}
+								<ToggleButton
+									className={styles.categoryButton}
+									value={0}
+									aria-label="new"
 								>
-									<Box className={styles.newCategoryIconWrapper}>
-										<AddCircleIcon className={styles.newCategoryIcon} />
-										<Typography>New</Typography>
-									</Box>
-								</IconButton>
-							</ToggleButton>
-						</ToggleButtonGroup>
-					</Grid>
+									<IconButton
+										className={styles.newCategoryButton}
+										to={{
+											pathname: '/new-category',
+											state: { prevRoute: history.location.pathname },
+										}}
+										component={Link}
+									>
+										<Box className={styles.categoryWrapper}>
+											<AddCircleIcon className={styles.categoryIcon} />
+											<Typography>New</Typography>
+										</Box>
+									</IconButton>
+								</ToggleButton>
+							</ToggleButtonGroup>
+						)}
+					/>
 				</Paper>
-				{!!error && <Typography color="error">{error}</Typography>}
+				{!!formError && <Typography color="error">{formError}</Typography>}
 			</Box>
 			<SubmitButton
 				isLoading={isLoading}
-				disabled={
-					!state.amount ||
-					!category ||
-					!date ||
-					!!error ||
-					new Date(date) > new Date() ||
-					category === 'New'
-				}
+				disabled={!isEmptyFields || !!formError}
 				text="Create"
 			/>
 		</form>

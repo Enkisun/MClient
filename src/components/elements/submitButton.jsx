@@ -1,11 +1,11 @@
 import React from 'react';
 import { Button, makeStyles } from '@material-ui/core';
-import Loader from '../elements/loader';
+import Loader from './loader';
 
 const useStyles = makeStyles(
 	(theme) => ({
 		submit: {
-			height: theme.spacing(5),
+			height: theme.spacing(6),
 		},
 	}),
 	{

@@ -1,4 +1,8 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import {
+	createAsyncThunk,
+	createEntityAdapter,
+	createSlice,
+} from '@reduxjs/toolkit';
 import { fetchCreateCategory, fetchGetCategories } from '../api/api';
 
 export const getCategories = createAsyncThunk(
@@ -10,7 +14,6 @@ export const getCategories = createAsyncThunk(
 				spaceId,
 				id,
 			});
-
 			return response.data;
 		} catch (e) {
 			return rejectWithValue(e.message);
@@ -20,30 +23,37 @@ export const getCategories = createAsyncThunk(
 
 export const createCategory = createAsyncThunk(
 	'category/createCategory',
-	async ({ category }, { getState, rejectWithValue }) => {
+	async ({ category, emoji }, { getState, rejectWithValue }) => {
 		const { spaceId, id } = getState().auth.user;
-
 		try {
-			await fetchCreateCategory(category, spaceId, id);
+			const response = await fetchCreateCategory(category, emoji, spaceId, id);
+			return response.data.result;
 		} catch (e) {
-			return rejectWithValue(e.message);
+			if (!e.response) {
+				return rejectWithValue(e.message);
+			}
+			return rejectWithValue(e.response.data.message);
 		}
 	}
 );
 
+export const categoriesAdapter = createEntityAdapter({
+	selectId: (entity) => entity._id,
+	sortComparer: (a, b) => a.createdAt.localeCompare(b.createdAt),
+});
+
 export const categoriesSlice = createSlice({
 	name: 'category',
-	initialState: {
-		categories: [],
+	initialState: categoriesAdapter.getInitialState({
 		isLoading: false,
-		isNewCategory: false,
-	},
+		createdCategory: {},
+	}),
 	extraReducers: {
 		[getCategories.pending]: (state) => {
 			state.isLoading = true;
 		},
 		[getCategories.fulfilled]: (state, action) => {
-			state.categories = action.payload;
+			categoriesAdapter.setAll(state, action.payload);
 			state.isLoading = false;
 		},
 		[getCategories.rejected]: (state) => {
@@ -52,7 +62,8 @@ export const categoriesSlice = createSlice({
 		[createCategory.pending]: (state) => {
 			state.isLoading = true;
 		},
-		[createCategory.fulfilled]: (state) => {
+		[createCategory.fulfilled]: (state, action) => {
+			state.createdCategory = action.payload;
 			state.isLoading = false;
 		},
 		[createCategory.rejected]: (state) => {
@@ -60,5 +71,9 @@ export const categoriesSlice = createSlice({
 		},
 	},
 });
+
+export const categoriesSelectors = categoriesAdapter.getSelectors(
+	(state) => state.categories
+);
 
 export const categoriesReducer = categoriesSlice.reducer;

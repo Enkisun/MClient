@@ -15,7 +15,8 @@ const reduceCategories = (transactions, categories) => {
 			[el.categoryId]: { name: category.name, value: el.amount },
 		};
 	}, {});
+
 	return Object.values(categoryData);
 };
 
-export default reduceCategories;
+export default { reduceCategories };

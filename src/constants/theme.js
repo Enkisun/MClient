@@ -14,7 +14,7 @@ const theme = createTheme({
 		},
 		text: {
 			primary: '#1a202c',
-			secondary: '#fff',
+			secondary: '#767778',
 		},
 		background: {
 			default: '#fff',
@@ -86,12 +86,18 @@ const theme = createTheme({
 		MuiToggleButton: {
 			root: {
 				border: 'none',
+				color: 'initial',
 				'&$selected': {
 					color: 'initial',
 					'&:hover': {
 						borderRadius: 8,
 					},
 				},
+			},
+		},
+		MuiIconButton: {
+			root: {
+				color: 'initial',
 			},
 		},
 		MuiBottomNavigation: {

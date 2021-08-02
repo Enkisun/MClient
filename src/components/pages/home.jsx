@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 // import { Button, Link } from '@material-ui/core';
-import TransactionsChartPie from '../elements/transactionsChartPie';
+import TransactionsChartPie from '../modules/transactionsChartPie';
 import LatestTransactions from '../modules/latestTransactions';
 
 const HomePage = () => {

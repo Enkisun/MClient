@@ -12,14 +12,14 @@ const useStyles = makeStyles(
 			width: '100%',
 		},
 		loader: {
-			color: theme.palette.primary.dark,
+			color: theme.palette.primary.main,
 			display: 'inline-block',
 			position: 'relative',
-			width: 30,
-			height: 30,
+			width: theme.spacing(4),
+			height: theme.spacing(4),
 		},
 		loaderItem: {
-			transformOrigin: '15px 15px',
+			transformOrigin: '16px 16px',
 			animation: '$loader 0.8s linear infinite',
 			'&:after': {
 				content: "' '",
@@ -31,7 +31,7 @@ const useStyles = makeStyles(
 				width: 8,
 				height: 5,
 				borderRadius: '30%',
-				background: theme.palette.secondary.main,
+				background: theme.palette.primary.main,
 			},
 			'&:nth-of-type(1)': {
 				transform: 'rotate(0deg)',

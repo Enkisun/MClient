@@ -3,9 +3,7 @@ import {
 	createEntityAdapter,
 	createSlice,
 } from '@reduxjs/toolkit';
-import { createSelector } from 'reselect';
 import { fetchGetExpenses, fetchCreateExpense } from '../api/api';
-import sortTransactions from '../utils/transactions.utils';
 
 export const getExpenses = createAsyncThunk(
 	'transaction/getExpenses',
@@ -18,7 +16,6 @@ export const getExpenses = createAsyncThunk(
 				spaceId,
 				id,
 			});
-
 			return response.data;
 		} catch (e) {
 			if (!e.response) {
@@ -31,10 +28,10 @@ export const getExpenses = createAsyncThunk(
 
 export const createExpense = createAsyncThunk(
 	'transaction/createExpense',
-	async ({ amount, categoryId, date, note }, { getState, rejectWithValue }) => {
+	async ({ amount, date, note, categoryId }, { getState, rejectWithValue }) => {
 		const { spaceId, id } = getState().auth.user;
 		try {
-			await fetchCreateExpense(amount, categoryId, date, note, spaceId, id);
+			await fetchCreateExpense(amount, date, note, categoryId, spaceId, id);
 		} catch (e) {
 			if (!e.response) {
 				return rejectWithValue(e.message);
@@ -44,7 +41,7 @@ export const createExpense = createAsyncThunk(
 	}
 );
 
-const transactionsAdapter = createEntityAdapter({
+export const transactionsAdapter = createEntityAdapter({
 	selectId: (entity) => entity._id,
 	sortComparer: (a, b) => a.date.localeCompare(b.date),
 });
@@ -79,12 +76,6 @@ export const transactionsSlice = createSlice({
 
 export const transactionsSelectors = transactionsAdapter.getSelectors(
 	(state) => state.transactions
-);
-
-export const selectGroupedByDayTransactions = createSelector(
-	transactionsSelectors.selectAll,
-	(state) => state.categories.categories,
-	(transactions, categories) => sortTransactions(transactions, categories)
 );
 
 export const transactionsReducer = transactionsSlice.reducer;

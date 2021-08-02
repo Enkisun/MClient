@@ -5,7 +5,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Box, Typography, List, ListItem, IconButton } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
-import { getCategories } from '../../slices/categoriesSlice';
+import {
+	categoriesSelectors,
+	getCategories,
+} from '../../slices/categoriesSlice';
 
 const useStyles = makeStyles(
 	(theme) => ({
@@ -24,7 +27,7 @@ const CategoriesPage = () => {
 	const styles = useStyles();
 	const location = useLocation();
 	const dispatch = useDispatch();
-	const { categories } = useSelector((s) => s.categories);
+	const categories = useSelector(categoriesSelectors.selectAll);
 
 	useEffect(() => {
 		dispatch(getCategories());

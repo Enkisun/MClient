@@ -2,8 +2,7 @@ import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { makeStyles } from '@material-ui/core/styles';
-import { transactionsSelectors } from '../../slices/transactionsSlice';
-import reduceCategories from '../../utils/categories.utils';
+import selectors from '../../selectors';
 
 const useStyles = makeStyles(
 	() => ({
@@ -47,16 +46,11 @@ const renderCustomizedLabel = ({
 
 const TransactionsChartPie = ({ data, setData }) => {
 	const styles = useStyles();
-	const { categories } = useSelector((s) => s.categories);
-	const transactions = useSelector(transactionsSelectors.selectAll);
+	const chartData = useSelector(selectors.selectReducedByValueCategories);
 
 	useEffect(() => {
-		if (!transactions.length || !categories.length) {
-			setData([{ name: '', value: 1 }]);
-		} else {
-			setData([...reduceCategories(transactions, categories)]);
-		}
-	}, [transactions, categories]);
+		setData(chartData);
+	}, [chartData]);
 
 	return (
 		<ResponsiveContainer width="100%" aspect={1} className={styles.container}>

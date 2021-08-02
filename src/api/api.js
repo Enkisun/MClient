@@ -16,17 +16,17 @@ export const fetchGetExpenses = async ({ from, to, spaceId, id }) =>
 
 export const fetchCreateExpense = async (
 	amount,
-	categoryId,
 	date,
 	note,
+	categoryId,
 	spaceId,
 	id
 ) =>
 	await axios.post(`/transactions`, {
 		amount,
-		categoryId,
 		date,
 		note,
+		categoryId,
 		spaceId,
 		id,
 	});
@@ -34,9 +34,10 @@ export const fetchCreateExpense = async (
 export const fetchGetCategories = async ({ spaceId, id }) =>
 	await axios.get(`/categories?spaceId=${spaceId}&id=${id}`);
 
-export const fetchCreateCategory = async (category, spaceId, id) =>
+export const fetchCreateCategory = async (category, emoji, spaceId, id) =>
 	await axios.post(`/categories`, {
 		category,
+		emoji,
 		spaceId,
 		id,
 	});
